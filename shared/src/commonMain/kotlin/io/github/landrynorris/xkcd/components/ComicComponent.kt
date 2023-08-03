@@ -45,7 +45,7 @@ class ComicComponent: ComicLogic {
     override fun loadNext() = loadComic(number = state.value.number+1)
     override fun loadPrevious() = loadComic(number = state.value.number-1)
 
-    override fun loadRandom() = loadComic(Random.nextInt(state.value.newest))
+    override fun loadRandom() = loadComic(Random.nextInt(state.value.newest)+1)
 
     override fun loadComic(number: Int) {
         context.launch {

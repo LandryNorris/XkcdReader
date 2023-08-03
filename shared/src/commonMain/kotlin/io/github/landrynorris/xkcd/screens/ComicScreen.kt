@@ -1,6 +1,5 @@
 package io.github.landrynorris.xkcd.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
@@ -9,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,21 +26,30 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.landrynorris.xkcd.components.ComicLogic
+import io.github.landrynorris.xkcd.components.ComicState
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import kotlinx.coroutines.delay
 
 @Composable
 fun ComicScreen(logic: ComicLogic) {
+    val state by logic.state.collectAsState()
+    ComicColumn(state, logic)
+
     LaunchedEffect(Unit) {
         logic.loadLatest()
     }
+}
 
-    val state by logic.state.collectAsState()
+@Composable
+fun ComicColumn(state: ComicState, logic: ComicLogic) {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(modifier = Modifier.weight(1f)) {
             if(state.imageUrl != null) {
                 ComicViewPane {
-                    KamelImage(asyncPainterResource(state.imageUrl!!), state.transcript, alignment = Alignment.TopCenter)
+                    KamelImage(asyncPainterResource(state.imageUrl), state.transcript,
+                        onLoading = { CircularProgressIndicator() },
+                        alignment = Alignment.TopCenter)
                 }
             }
         }
