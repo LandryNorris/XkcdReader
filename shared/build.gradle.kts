@@ -4,6 +4,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
+    id("app.cash.sqldelight")
 }
 
 val ktorVersion = "2.3.2"
@@ -47,6 +48,7 @@ kotlin {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.9.0")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
+                implementation("app.cash.sqldelight:android-driver:2.0.0")
             }
         }
         val iosX64Main by getting
@@ -60,6 +62,7 @@ kotlin {
 
             dependencies {
                 implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+                implementation("app.cash.sqldelight:native-driver:2.0.0")
             }
         }
     }
@@ -83,5 +86,13 @@ android {
     }
     kotlin {
         jvmToolchain(11)
+    }
+}
+
+sqldelight {
+    databases {
+        create("ComicDatabase") {
+            packageName.set("io.github.landrynorris.xkcd.database")
+        }
     }
 }

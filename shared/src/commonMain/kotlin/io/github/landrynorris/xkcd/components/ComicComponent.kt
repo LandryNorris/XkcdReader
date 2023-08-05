@@ -2,6 +2,7 @@ package io.github.landrynorris.xkcd.components
 
 import androidx.compose.ui.geometry.Offset
 import io.github.landrynorris.xkcd.model.XkcdModel
+import io.github.landrynorris.xkcd.repositories.ComicRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -30,16 +31,7 @@ interface ComicLogic {
     fun onPanZoom(scale: Float, offset: Offset)
 }
 
-class ComicComponent: ComicLogic {
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
-        }
-    }
-
+class ComicComponent(private val repository: ComicRepository): ComicLogic {
     private val context = CoroutineScope(Dispatchers.Default)
 
     override val state = MutableStateFlow(ComicState())
@@ -58,7 +50,7 @@ class ComicComponent: ComicLogic {
 
     override fun loadComic(number: Int) {
         context.launch {
-            val model = client.get("https://xkcd.com/$number/info.0.json").body<XkcdModel>()
+            val model = repository.getComic(number)
 
             state.update { it.copy(title = model.title, imageUrl = model.img,
                 altText = model.alt, number = number, zoomScale = 1.0f, panOffset = Offset.Zero) }
@@ -67,7 +59,7 @@ class ComicComponent: ComicLogic {
 
     override fun loadLatest() {
         context.launch {
-            val model = client.get("https://xkcd.com/info.0.json").body<XkcdModel>()
+            val model = repository.getLatestComic()
 
             state.update { it.copy(title = model.title, imageUrl = model.img,
                 transcript = model.transcript, altText = model.alt,

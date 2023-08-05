@@ -1,0 +1,25 @@
+import kotlin.Boolean;
+
+CREATE TABLE Comic(
+    number INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    img TEXT NOT NULL,
+    transcript TEXT NOT NULL,
+    alt TEXT NOT NULL,
+    isFavorite INTEGER AS Boolean NOT NULL
+);
+
+CREATE INDEX comic_text ON Comic(title, transcript, alt);
+
+saveComic:
+INSERT INTO Comic(title, img, transcript, alt, number, isFavorite)
+VALUES ?;
+
+searchComic:
+SELECT * FROM Comic WHERE title LIKE (:text || '%') OR transcript LIKE ('%' || :text || '%') LIMIT ?;
+
+maxSavedNumber:
+SELECT MAX(number) FROM Comic;
+
+getComic:
+SELECT * FROM Comic WHERE number = ?;
