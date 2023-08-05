@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -20,8 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +50,7 @@ fun ComicColumn(state: ComicState, logic: ComicLogic) {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(modifier = Modifier.weight(1f)) {
             if(state.imageUrl != null) {
-                ComicViewPane {
+                ComicViewPane(state.zoomScale, state.panOffset, logic::onPanZoom) {
                     KamelImage(asyncPainterResource(state.imageUrl), state.transcript,
                         onLoading = { CircularProgressIndicator() },
                         alignment = Alignment.TopCenter)
@@ -70,19 +74,18 @@ fun ComicColumn(state: ComicState, logic: ComicLogic) {
 }
 
 @Composable
-fun ComicViewPane(content: @Composable () -> Unit) {
-    var scale by remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
-    val state = rememberTransformableState { zoomChange, panChange, rotationChange ->
-        scale *= zoomChange
-        offsetX += panChange.x
-        offsetY += panChange.y
+fun ComicViewPane(scale: Float, offset: Offset, onPanZoom: (Float, Offset) -> Unit,
+                  content: @Composable () -> Unit) {
+    val state = rememberTransformableState { zoomChange, panChange, _ ->
+        val newScale = (scale * zoomChange).coerceAtLeast(1.0f)
+        val newOffset = offset + panChange
+        onPanZoom(newScale, newOffset)
     }
 
-    Box(modifier = Modifier.transformable(state)) {
-        Box(modifier = Modifier.scale(scale)) {
-            content()
-        }
+    Box(modifier = Modifier.graphicsLayer(
+        scaleX = scale, scaleY = scale,
+        translationX = offset.x, translationY = offset.y)
+        .transformable(state).clipToBounds()) {
+        content()
     }
 }
