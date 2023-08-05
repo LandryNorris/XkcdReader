@@ -8,32 +8,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.landrynorris.xkcd.components.ComicLogic
 import io.github.landrynorris.xkcd.components.ComicState
+import io.github.landrynorris.xkcd.components.SearchLogic
+import io.github.landrynorris.xkcd.model.XkcdModel
+import io.github.landrynorris.xkcd.ui.menu.DropdownMenuItem
+import io.github.landrynorris.xkcd.ui.menu.ExposedDropdownMenuBox
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import kotlinx.coroutines.delay
 
 @Composable
 fun ComicScreen(logic: ComicLogic) {
@@ -48,6 +45,7 @@ fun ComicScreen(logic: ComicLogic) {
 @Composable
 fun ComicColumn(state: ComicState, logic: ComicLogic) {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        SearchUi(logic.searchComponent) { logic.loadComic(it.num) }
         Box(modifier = Modifier.weight(1f)) {
             if(state.imageUrl != null) {
                 ComicViewPane(state.zoomScale, state.panOffset, logic::onPanZoom) {
@@ -87,5 +85,34 @@ fun ComicViewPane(scale: Float, offset: Offset, onPanZoom: (Float, Offset) -> Un
         translationX = offset.x, translationY = offset.y)
         .transformable(state).clipToBounds()) {
         content()
+    }
+}
+
+@Composable
+fun SearchUi(logic: SearchLogic, onResultSelected: (XkcdModel) -> Unit) {
+    val state by logic.state.collectAsState()
+
+    SearchBar(state.searchText, logic::searchTextUpdated, state.isExpanded,
+        logic::onExpandedChanged, onResultSelected, state.results)
+}
+
+@Composable
+fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit,
+              isExpanded: Boolean, onExpandedChanged: (Boolean) -> Unit,
+              onResultSelected: (XkcdModel) -> Unit,
+              results: List<XkcdModel>) {
+    ExposedDropdownMenuBox(isExpanded, onExpandedChanged) {
+        TextField(searchText, onSearchTextChanged)
+        ExposedDropdownMenu(isExpanded, { onExpandedChanged(false) }) {
+            results.forEach {
+                DropdownMenuItem(
+                    onClick = {
+                        onResultSelected(it)
+                        onExpandedChanged(false)
+                    }) {
+                    Text("${it.num}: ${it.title}")
+                }
+            }
+        }
     }
 }

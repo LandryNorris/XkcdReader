@@ -19,6 +19,7 @@ import kotlin.random.Random
 
 interface ComicLogic {
     val state: StateFlow<ComicState>
+    val searchComponent: SearchComponent
 
     fun loadComic(number: Int)
     fun loadLatest()
@@ -33,8 +34,9 @@ interface ComicLogic {
 
 class ComicComponent(private val repository: ComicRepository): ComicLogic {
     private val context = CoroutineScope(Dispatchers.Default)
-
     override val state = MutableStateFlow(ComicState())
+
+    override val searchComponent = SearchComponent(repository)
 
     override fun onPanZoom(scale: Float, offset: Offset) {
         state.update {

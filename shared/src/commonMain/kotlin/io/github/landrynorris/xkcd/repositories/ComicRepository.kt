@@ -35,8 +35,8 @@ class ComicRepository(database: ComicDatabase, private val httpClient: HttpClien
         return getLatestComicFromWeb()
     }
 
-    private fun getComicsMatching(text: String, limit: Int) =
-        comicQueries.searchComic(text, limit.toLong()).executeAsList()
+    fun getComicsMatching(text: String, limit: Int) =
+        comicQueries.searchComic(text, limit.toLong()).executeAsList().map { it.toXkcdModel() }
 
     private suspend fun getComicFromWeb(number: Int): XkcdModel =
         httpClient.get("https://xkcd.com/$number/info.0.json").body()
