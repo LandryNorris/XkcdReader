@@ -51,7 +51,7 @@ fun ComicColumn(state: ComicState, logic: ComicLogic) {
                 ComicViewPane(state.zoomScale, state.panOffset, logic::onPanZoom) {
                     KamelImage(asyncPainterResource(state.imageUrl), state.transcript,
                         onLoading = { CircularProgressIndicator() },
-                        alignment = Alignment.TopCenter)
+                        alignment = Alignment.Center)
                 }
             }
         }
