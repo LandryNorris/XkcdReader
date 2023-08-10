@@ -59,7 +59,7 @@ fun ComicColumn(state: ComicState, logic: ComicLogic) {
         }
         Spacer(modifier = Modifier.height(5.dp))
         Text(state.title, fontSize = 24.sp)
-        Text(state.altText, fontSize = 18.sp)
+        Text(state.altText, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(5.dp))
 
         Row {
