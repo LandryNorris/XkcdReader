@@ -1,6 +1,5 @@
 package io.github.landrynorris.xkcd.components
 
-import io.github.landrynorris.xkcd.database.ComicDatabase
 import io.github.landrynorris.xkcd.model.XkcdModel
 import io.github.landrynorris.xkcd.repositories.ComicRepository
 import kotlinx.coroutines.CoroutineScope
@@ -24,8 +23,15 @@ class SearchComponent(private val repository: ComicRepository): SearchLogic {
     override fun searchTextUpdated(text: String) {
         state.update { it.copy(searchText = text, isExpanded = true) }
         coroutineScope.launch {
-            val matching = repository.getComicsMatching(text, 5)
-            state.update { it.copy(results = matching) }
+
+            val searchedNumber = text.toIntOrNull()
+            if(searchedNumber != null) {
+                val comic = repository.getComicOrNull(searchedNumber)
+                state.update { it.copy(results = listOfNotNull(comic)) }
+            } else {
+                val matching = repository.getComicsMatching(text, 5)
+                state.update { it.copy(results = matching) }
+            }
         }
     }
 

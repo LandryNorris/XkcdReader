@@ -2,20 +2,13 @@ package io.github.landrynorris.xkcd.components
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.UriHandler
-import io.github.landrynorris.xkcd.model.XkcdModel
 import io.github.landrynorris.xkcd.repositories.ComicRepository
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 interface ComicLogic {
@@ -55,10 +48,12 @@ class ComicComponent(private val repository: ComicRepository): ComicLogic {
 
     override fun loadComic(number: Int) {
         context.launch {
-            val model = repository.getComic(number)
+            val model = repository.getComicOrNull(number)
 
-            state.update { it.copy(title = model.title, imageUrl = model.img,
-                altText = model.alt, number = number, zoomScale = 1.0f, panOffset = Offset.Zero) }
+            if(model != null) {
+                state.update { it.copy(title = model.title, imageUrl = model.img,
+                    altText = model.alt, number = number, zoomScale = 1.0f, panOffset = Offset.Zero) }
+            }
         }
     }
 
