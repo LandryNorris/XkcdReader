@@ -1,6 +1,7 @@
 package io.github.landrynorris.xkcd.components
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.UriHandler
 import io.github.landrynorris.xkcd.model.XkcdModel
 import io.github.landrynorris.xkcd.repositories.ComicRepository
 import io.ktor.client.HttpClient
@@ -28,6 +29,8 @@ interface ComicLogic {
     fun loadFirst()
 
     fun loadRandom()
+
+    fun explain(urlLoader: UriHandler)
 
     fun onPanZoom(scale: Float, offset: Offset)
 }
@@ -57,6 +60,10 @@ class ComicComponent(private val repository: ComicRepository): ComicLogic {
             state.update { it.copy(title = model.title, imageUrl = model.img,
                 altText = model.alt, number = number, zoomScale = 1.0f, panOffset = Offset.Zero) }
         }
+    }
+
+    override fun explain(urlLoader: UriHandler) {
+        urlLoader.openUri("https://www.explainxkcd.com/wiki/index.php/${state.value.number}")
     }
 
     override fun loadLatest() {

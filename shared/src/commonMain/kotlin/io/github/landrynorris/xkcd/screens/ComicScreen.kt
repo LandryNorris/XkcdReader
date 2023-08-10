@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.landrynorris.xkcd.components.ComicLogic
@@ -67,6 +69,9 @@ fun ComicColumn(state: ComicState, logic: ComicLogic) {
             if(state.number < state.newest) Button(onClick = logic::loadNext) { Text(">") }
             Button(onClick = logic::loadLatest) { Text(">>") }
         }
+        Spacer(modifier = Modifier.height(5.dp))
+        val urlLauncher = LocalUriHandler.current
+        TextButton(onClick = { logic.explain(urlLauncher) }) { Text("explain") }
         Spacer(modifier = Modifier.height(10.dp))
     }
 }
