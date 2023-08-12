@@ -48,7 +48,7 @@ fun ComicScreen(logic: ComicLogic) {
 fun ComicColumn(state: ComicState, logic: ComicLogic) {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         SearchUi(logic.searchComponent) { logic.loadComic(it.num) }
-        Box(modifier = Modifier.weight(1f)) {
+        Box(modifier = Modifier.weight(1f).clipToBounds()) {
             if(state.imageUrl != null) {
                 ComicViewPane(state.zoomScale, state.panOffset, logic::onPanZoom) {
                     KamelImage(asyncPainterResource(state.imageUrl), state.transcript,
@@ -88,7 +88,7 @@ fun ComicViewPane(scale: Float, offset: Offset, onPanZoom: (Float, Offset) -> Un
     Box(modifier = Modifier.graphicsLayer(
         scaleX = scale, scaleY = scale,
         translationX = offset.x, translationY = offset.y)
-        .transformable(state).clipToBounds()) {
+        .transformable(state)) {
         content()
     }
 }
