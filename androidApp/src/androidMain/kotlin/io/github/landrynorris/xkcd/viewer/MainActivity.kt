@@ -1,4 +1,4 @@
-package com.myapplication
+package io.github.landrynorris.xkcd.viewer
 
 import MainView
 import android.os.Bundle
