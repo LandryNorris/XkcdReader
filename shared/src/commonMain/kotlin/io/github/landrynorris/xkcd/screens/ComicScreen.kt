@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,8 +25,6 @@ import io.github.landrynorris.xkcd.components.ComicLogic
 import io.github.landrynorris.xkcd.components.ComicState
 import io.github.landrynorris.xkcd.components.SearchLogic
 import io.github.landrynorris.xkcd.model.XkcdModel
-import io.github.landrynorris.xkcd.ui.menu.DropdownMenuItem
-import io.github.landrynorris.xkcd.ui.menu.ExposedDropdownMenuBox
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 
@@ -101,6 +95,7 @@ fun SearchUi(logic: SearchLogic, onResultSelected: (XkcdModel) -> Unit) {
         logic::onExpandedChanged, onResultSelected, state.results)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit,
               isExpanded: Boolean, onExpandedChanged: (Boolean) -> Unit,
