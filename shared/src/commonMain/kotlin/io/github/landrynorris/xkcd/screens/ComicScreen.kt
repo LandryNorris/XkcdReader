@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -95,23 +95,23 @@ fun SearchUi(logic: SearchLogic, onResultSelected: (XkcdModel) -> Unit) {
         logic::onExpandedChanged, onResultSelected, state.results)
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit,
               isExpanded: Boolean, onExpandedChanged: (Boolean) -> Unit,
               onResultSelected: (XkcdModel) -> Unit,
               results: List<XkcdModel>) {
     ExposedDropdownMenuBox(isExpanded, onExpandedChanged) {
-        TextField(searchText, onSearchTextChanged)
+        TextField(searchText, onSearchTextChanged, modifier = Modifier.menuAnchor())
         ExposedDropdownMenu(isExpanded, { onExpandedChanged(false) }) {
             results.forEach {
                 DropdownMenuItem(
                     onClick = {
                         onResultSelected(it)
                         onExpandedChanged(false)
-                    }) {
-                    Text("${it.num}: ${it.title}")
-                }
+                    }, text =  {
+                        Text("${it.num}: ${it.title}")
+                    })
             }
         }
     }
