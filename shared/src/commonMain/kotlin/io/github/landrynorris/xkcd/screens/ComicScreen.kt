@@ -1,13 +1,11 @@
 package io.github.landrynorris.xkcd.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -87,32 +85,27 @@ fun ComicViewPane(scale: Float, offset: Offset, onPanZoom: (Float, Offset) -> Un
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchUi(logic: SearchLogic, onResultSelected: (XkcdModel) -> Unit) {
     val state by logic.state.collectAsState()
 
-    SearchBar(state.searchText, logic::searchTextUpdated, state.isExpanded,
-        logic::onExpandedChanged, onResultSelected, state.results)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit,
-              isExpanded: Boolean, onExpandedChanged: (Boolean) -> Unit,
-              onResultSelected: (XkcdModel) -> Unit,
-              results: List<XkcdModel>) {
-    ExposedDropdownMenuBox(isExpanded, onExpandedChanged) {
-        TextField(searchText, onSearchTextChanged, modifier = Modifier.menuAnchor())
-        ExposedDropdownMenu(isExpanded, { onExpandedChanged(false) }) {
-            results.forEach {
-                DropdownMenuItem(
-                    onClick = {
-                        onResultSelected(it)
-                        onExpandedChanged(false)
-                    }, text =  {
-                        Text("${it.num}: ${it.title}")
-                    })
-            }
+    SearchBar(state.searchText,
+        onQueryChange = logic::searchTextUpdated,
+        onSearch = {},
+        active = state.isExpanded,
+        onActiveChange = logic::onExpandedChanged,
+        placeholder = { Text("Search by number or title") },
+        leadingIcon = { Icon(Icons.Default.Search, "search") }
+    ) {
+        for(comic in state.results) {
+            ListItem(
+                headlineContent = { Text("${comic.num}: ${comic.title}") },
+                modifier = Modifier.clickable {
+                    onResultSelected(comic)
+                    logic.onExpandedChanged(false)
+                }.fillMaxWidth()
+            )
         }
     }
 }
